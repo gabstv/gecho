@@ -1,6 +1,8 @@
 package gecho
 
 import (
+	"context"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -72,4 +74,10 @@ func Delete[ReqT, ResT any](e *echo.Echo, path string, fn func(c echo.Context, r
 		}
 		return c.JSON(200, res)
 	}, m...)
+}
+
+func Wrap[ReqT, ResT any](fn func(c context.Context, req ReqT) (ResT, error)) func(c echo.Context, req ReqT) (ResT, error) {
+	return func(c echo.Context, req ReqT) (ResT, error) {
+		return fn(c.Request().Context(), req)
+	}
 }
