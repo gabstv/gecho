@@ -44,6 +44,12 @@ func TestGet(t *testing.T) {
 		case "2":
 			return janeDoe, nil
 		}
+		switch req.Name {
+		case "John Doe":
+			return johnDoe, nil
+		case "Jane Doe":
+			return janeDoe, nil
+		}
 		return User{}, echo.ErrNotFound
 	}
 
@@ -78,5 +84,23 @@ func TestGet(t *testing.T) {
 		assert.NoError(t, err)
 		defer resp.Body.Close()
 		assert.Equal(t, http.StatusNotFound, resp.StatusCode)
+	})
+	t.Run("john doe 2", func(t *testing.T) {
+		resp, err := http.Get("http://localhost:7000/user?id=1")
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		defer resp.Body.Close()
+		var usr User
+		assert.NoError(t, json.NewDecoder(resp.Body).Decode(&usr))
+		assert.Equal(t, johnDoe, usr)
+	})
+	t.Run("john doe by name", func(t *testing.T) {
+		resp, err := http.Get("http://localhost:7000/user?name=John%20Doe")
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		defer resp.Body.Close()
+		var usr User
+		assert.NoError(t, json.NewDecoder(resp.Body).Decode(&usr))
+		assert.Equal(t, johnDoe, usr)
 	})
 }
