@@ -127,3 +127,13 @@ func Wrap[ReqT, ResT any](fn func(c context.Context, req ReqT) (ResT, error)) fu
 		return fn(c.Request().Context(), req)
 	}
 }
+
+// CtxGet converts to T. Returns the zero value if not found
+func CtxGet[T any](c echo.Context, key string) T {
+	v, _ := c.Get(key).(T)
+	return v
+}
+
+func CtxSet[T any](c echo.Context, key string, v T) {
+	c.Set(key, v)
+}
